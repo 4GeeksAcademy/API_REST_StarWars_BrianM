@@ -17,7 +17,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
     subscription_data: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
-    favorites: Mapped[list["Favorito"]] = relationship(back_populates="usuario")
+    favorites: Mapped[list["Favorite"]] = relationship(back_populates="user")
     
     def serialize(self) -> dict:
         return {
@@ -46,15 +46,15 @@ class Planet(db.Model):
             "population": self.population
         }
 
-class Character(db.Model):
+class People(db.Model):
     
-    __tablename__ = 'characters'
+    __tablename__ = 'peoples'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     gender: Mapped[Optional[str]] = mapped_column(String(20))
     birth: Mapped[Optional[str]] = mapped_column(String(20))
-    favorites: Mapped[list["Favorite"]] = relationship(back_populates="personaje")
+    favorites: Mapped[list["Favorite"]] = relationship(back_populates="people")
     
     def serialize(self) -> dict:
         return {
@@ -66,20 +66,20 @@ class Character(db.Model):
 
 class Favorite(db.Model):
     
-    __tablename__ = 'favorites'
+    __tablename__ = 'favorite'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
     planet_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('planets.id'), nullable=True)
-    character_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('characters.id'), nullable=True)
+    people_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('peoples.id'), nullable=True)
     user: Mapped["User"] = relationship(back_populates="favorites")
     planet: Mapped[Optional["Planet"]] = relationship(back_populates="favorites")
-    character: Mapped[Optional["Character"]] = relationship(back_populates="favorites")
+    people: Mapped[Optional["People"]] = relationship(back_populates="favorites")
     
     def serialize(self) -> dict:
         return {
             "id": self.id,
             "user_id": self.user_id,
             "planet_id": self.planet_id,
-            "character_id": self.character_id
+            "people_id": self.people_id
         }
